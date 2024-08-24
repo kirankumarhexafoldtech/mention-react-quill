@@ -1,0 +1,21 @@
+.main{
+  padding: 10%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.quill{
+  height: 150px;
+  width: 500px;
+}
+.editor{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.html{
+  width: 600px;
+  padding:0 5%;
+  border: 1px solid rgb(179, 179, 179);
+  margin: 100px 0 0 350px;
+}
