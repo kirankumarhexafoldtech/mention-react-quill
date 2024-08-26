@@ -9,68 +9,110 @@ function App() {
   const quillRef = useRef(null);
   const [cursor, setCursor] = useState(0);
   const [cursorActive, setCursorActive] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
 
-  const handleSetValue = (content, delta, source, editor) =>{
-    // setValue(content)
-    // const cursorPosition = editor.getSelection()?.index;
-    // if(delta.ops[delta.ops.length-1].insert == '@'){
-    //   console.log("insert", )
-    // }
-    // if(content.includes(" @")){
-
-    //   const index = content.indexOf(" @")
-    //   const textBefore = content.split(" @");
-    //   const newContent= ` <a href="https://google.com" target="__blank">kiran kumar</a>`;
-    //   const textAfter = `${textBefore[0]}${newContent}${textBefore[1]}`;
-    //   setValue(textAfter);
-    //   console.log(Quill)
-    // }
+  const handleSetValue = (content, delta, source, editor) => {
     const cursorPosition = editor.getSelection()?.index || 0;
 
+ 
     if (content.includes(" @")) {
-      const index = content.indexOf(" @");
-      const textBefore = content.slice(0, index + 1);
-      const textAfter = content.slice(index + 2);
-
-      const mentionHTML = ` <a href="https://google.com" target="__blank">kiran kumar</a>`;
-
-      const newContent = `${textBefore}${mentionHTML}${textAfter}`;
-      setValue(newContent);
-
-      console.log(index)
-
-      // Set the cursor position right after the mention
+      setValue(content);
+      setCursor(cursorPosition);
+      const { top, left } = editor.getBounds(cursorPosition);
+      setPopupPosition({ top: top + 50, left });
+      setShowPopup(true);
       setTimeout(() => {
         const quill = quillRef.current.getEditor();
-        quill.setSelection(cursorPosition + 10); // Adjust cursor position
+        quill.setSelection(cursorPosition + 2);
       }, 0);
+      // const index = content.indexOf(" @");
+      // const textBefore = content.slice(0, index + 1);
+      // const textAfter = content.slice(index + 2);
+
+      // const mentionHTML = ` <a href="https://google.com" target="__blank">kiran kumar</a>`;
+
+      // const newContent = `${textBefore}${mentionHTML}${textAfter}`;
+      // setValue(newContent);
+
+      // setTimeout(() => {
+      //   const quill = quillRef.current.getEditor();
+      //   quill.setSelection(cursorPosition + 10);
+      // }, 0);
     } else {
       setValue(content);
     }
   };
 
-  const handleSetCursor = (value)=>{
-    if(cursorActive){
-      setCursor(value)
-    }
-  }
+  const handleSelectOption = (option) => {
+    setShowPopup(false);
+
+    const index = value.indexOf(" @");
   
+    const textBefore = value.slice(0, index + 1);
+    const textAfter = value.slice(index + 2);
+
+    const mentionHTML = ` <a href="https://google.com" target="__blank">${option}</a>`;
+    const newContent = `${textBefore}${mentionHTML}${textAfter}`;
+    setValue(newContent);
+
+    setTimeout(() => {
+      const quill = quillRef.current.getEditor();
+      quill.setSelection(cursor + option.length);
+    }, 0);
+
+    // const quillEditor = document.querySelector('.ql-editor');
+    // const cursorPosition = quillEditor.selectionStart;
+    // const textBeforeCursor = editorValue.slice(0, cursorPosition - 1);
+    // const textAfterCursor = editorValue.slice(cursorPosition);
+
+    // const newValue = `${textBeforeCursor}${option}${textAfterCursor}`;
+    // setEditorValue(newValue);
+  };
+
+  const handleSetCursor = (value) => {
+    if (cursorActive) {
+      setCursor(value);
+    }
+  };
 
   return (
     <>
       <div className="main">
         <div className="editor">
-        <ReactQuill theme="snow" ref={quillRef} value={value} onChange={handleSetValue} onChangeSelection={(e)=>{
-          handleSetCursor(e.index)
-          console.log("change selection",e.index)
-        }}/>
+          <ReactQuill
+            theme="snow"
+            ref={quillRef}
+            value={value}
+            onChange={handleSetValue}
+          />
+          {showPopup && (
+            <div
+              style={{
+                position: "absolute",
+                top: popupPosition.top,
+                left: popupPosition.left,
+                zIndex: 10,
+              }}
+            >
+              <div className="popup-box">
+                <p>Select an option</p>
+                <button onClick={() => handleSelectOption("John Doe")}>
+                  John Doe
+                </button>
+                <button onClick={() => handleSelectOption("Jane Doe")}>
+                  Jane Doe
+                </button>
+                {/* Add more options as needed */}
+              </div>
+            </div>
+          )}
         </div>
-        {
-value ? 
-        <div className="html"
-      dangerouslySetInnerHTML={{ __html: value }}
-    /> : ''
-        }
+        {value ? (
+          <div className="html" dangerouslySetInnerHTML={{ __html: value }} />
+        ) : (
+          ""
+        )}
       </div>
     </>
   );
