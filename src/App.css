@@ -11,7 +11,14 @@
 .editor{
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+}
+/* .ql-toolbar{
+  display: none;
+} */
+.ql-container{
+  border: 1px solid black;
 }
 .html{
   width: 600px;
